@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:amcharts="http://www.amcharts.com/com_internal"
+			   width="100%" height="100%"
+			   initialize="init(event)">
+	<fx:Style> 
+		@font-face 
+		{
+			src: url("com/assets/tahoma.ttf");
+			fontFamily: "Tahoma";
+			embedAsCFF: false;
+			unicode-range:
+				U+0020-U+0040, /* Punctuation, Numbers */
+				U+0041-U+005A, /* Upper-Case A-Z */
+				U+005B-U+0060, /* Punctuation and Symbols */
+				U+0061-U+007A, /* Lower-Case a-z */
+				U+007B-U+007E; /* Punctuation and Symbols */            
+		}  
+		
+		.TextStyle 
+		{ 
+			font-family: Tahoma; 
+		}	
+	</fx:Style>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.amcharts.events.AxisEvent;
+			import com.amcharts.events.GraphEvent;
+			import com.classes.PingerPoint;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.Text;
+			import mx.events.FlexEvent;
+			import mx.formatters.DateFormatter;
+			import mx.rpc.events.ResultEvent;
+			
+			public var pingerPointList:ArrayCollection;
+			[Bindable]
+			private var chartData:ArrayCollection = new ArrayCollection();
+			private var pingerHost:String;
+			private var type:String;
+			private var srcIP:String;
+			private var destIP:String;
+			private var pingerTimeStart:Number=0;
+			private var pingerTimeEnd:Number=0;
+			
+			private var model:XML = new XML();
+			
+			protected function init(event:FlexEvent):void
+			{
+				pingerHost=this.parameters.pingerHost.toString();
+				type = this.parameters.type.toString();
+				srcIP=this.parameters.srcIP.toString();
+				destIP=this.parameters.destIP.toString();
+				pingerTimeStart=this.parameters.pingerTimeStart;
+				pingerTimeEnd=this.parameters.pingerTimeEnd;
+				var url:URLRequest = new URLRequest("../../config/Node.xml");  
+				var loader:URLLoader = new URLLoader();
+				loader.addEventListener(Event.COMPLETE,handleCompleted);	
+				loader.load(url);
+			}
+			
+			private function handleCompleted(event:Event):void
+			{
+				
+				var loader:URLLoader = URLLoader(event.target);				
+				model = XML(loader.data);
+//				Alert.show(bwctlHost.toString());
+				var obj:Object = model.hostname.(@name==pingerHost); 
+				var srcURL:Object = model.ip.(@name==srcIP); 
+				var destURL:Object = model.ip.(@name==destIP); 
+				var src:String = srcURL.addr.(@type==type).valueOf();
+				var dest:String = destURL.addr.(@type==type).valueOf();
+				var url:String = "http://" + src + obj.url.valueOf();
+//				Alert.show(src);
+				serv.setPingerPointList(url,src,dest,pingerTimeStart,pingerTimeEnd);
+				
+			}
+			
+			protected function setPingerPointList_resultHandler(event:ResultEvent):void
+			{
+				pingerPointList = ArrayCollection(event.result);
+//				Alert.show(pingerPointList.length.toString());
+				for(var i:int=0; i<pingerPointList.length; i++){
+					var pingerPoint:PingerPoint=pingerPointList.getItemAt(i) as PingerPoint;
+					var date:Date=new Date(pingerPoint.unixtime*1000);
+					var df:DateFormatter = new DateFormatter();
+					df.formatString = "HH:NN YYYY/MM/DD";
+//					chartData.addItem(
+//						{time:df.format(date), 
+//							minRtt:pingerPoint.minRtt, 
+//							maxRtt:pingerPoint.maxRtt, 
+//							medianRtt:pingerPoint.medianRtt, 
+//							meanRtt:pingerPoint.meanRtt,
+//							iqrIpd:pingerPoint.iqrIpd, 
+//							maxIpd:pingerPoint.maxIpd, 
+//							meanIpd:pingerPoint.meanIpd});
+					var obj:Object = new Object();
+					obj.time = df.format(date);
+					if(pingerPoint.minRtt != 0){
+						obj.minRtt = pingerPoint.minRtt;
+					}
+					if(pingerPoint.maxRtt != 0){
+						obj.maxRtt = pingerPoint.maxRtt;
+					}
+					if(pingerPoint.medianRtt != 0){
+						obj.medianRtt = pingerPoint.medianRtt;
+					}
+					if(pingerPoint.meanRtt != 0){
+						obj.meanRtt = pingerPoint.meanRtt;
+					}
+					if(pingerPoint.iqrIpd != 0){
+						obj.iqrIpd = pingerPoint.iqrIpd;
+					}
+					if(pingerPoint.maxIpd != 0){
+						obj.maxIpd = pingerPoint.maxIpd;
+					}
+					if(pingerPoint.meanIpd != 0){
+						obj.meanIpd = pingerPoint.meanIpd;
+					}
+					chartData.addItem(obj);
+				}
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<!-- flex与普通java类的方法通信 -->
+		<s:RemoteObject id="serv" destination="myservice" showBusyCursor="true">
+			<s:method name="setPingerPointList" result="setPingerPointList_resultHandler(event)"/>
+		</s:RemoteObject>
+	</fx:Declarations>
+	
+	<s:HGroup width="100%" height="100%" >
+		<amcharts:AmSerialChart
+			id="chart" 
+			width="80%" 
+			height="90%"
+			dataProvider="{chartData}" 
+			categoryField="time"
+			plotAreaFillAlphas="[0]">			
+			<amcharts:graphs>
+				<amcharts:AmGraph
+					id="g0" 
+					lineColor="#44e2ec"
+					fillColors="[#ffffff]"  
+					lineThickness="1.5"
+					valueField="minRtt"
+					valueAxis="{delayValue}"
+					bulletSize="3"
+					bulletAlpha="0."
+					bullet="bubble"
+					title="minRtt(ms)"
+					balloonText="[[minRtt]]ms"
+					balloonColor="#44e2ec"
+					type="line"/>
+				<amcharts:AmGraph
+					id="g1" 
+					lineColor="#46aab9"
+					fillColors="[#ffffff]"  
+					lineThickness="1.5"
+					valueField="maxRtt"
+					valueAxis="{delayValue}"
+					bulletSize="3"
+					title="maxRtt(ms)"
+					bulletAlpha="0."
+					bullet="bubble"
+					balloonText="[[maxRtt]]ms"
+					balloonColor="#46aab9"
+					type="line"/>
+				<amcharts:AmGraph
+					id="g2" 
+					lineColor="#4f83e4"
+					fillColors="[#ffffff]"
+					lineThickness="1.5"
+					valueField="medianRtt"
+					valueAxis="{delayValue}"
+					bulletSize="3"
+					title="medianRtt(ms)"
+					bulletAlpha="0."
+					bullet="bubble"
+					balloonText="[[medianRtt]]ms"
+					balloonColor="#4f83e4"
+					type="line"/>
+				<amcharts:AmGraph
+					id="g3" 
+					lineColor="#b9cb3f"
+					fillColors="[#ffffff]"  
+					lineThickness="1.5"
+					valueField="meanRtt"
+					valueAxis="{delayValue}"
+					bulletSize="3"
+					title="meanRtt(ms)"
+					bulletAlpha="0."
+					bullet="bubble"
+					balloonText="[[meanRtt]]ms"
+					balloonColor="#b9cb3f"
+					type="line"/>
+				<amcharts:AmGraph
+					id="g4" 
+					lineColor="#8f4ee0"
+					fillColors="[#ffffff]"
+					lineThickness="1.5"
+					valueField="iqrIpd"
+					valueAxis="{delayValue}"
+					bulletSize="3"
+					title="iqrIpd(ms)"
+					bulletAlpha="0."
+					bullet="bubble"
+					balloonText="[[iqrIpd]]ms"
+					balloonColor="#8f4ee0"
+					type="line"/>
+				<amcharts:AmGraph
+					id="g5" 
+					lineColor="#179d6f"
+					fillColors="[#ffffff]"  
+					lineThickness="1.5"
+					valueField="maxIpd"
+					valueAxis="{delayValue}"
+					bulletSize="3"
+					title="maxIpd(ms)"
+					bulletAlpha="0."
+					bullet="bubble"
+					balloonText="[[maxIpd]]ms"
+					balloonColor="#179d6f"
+					type="line"/>
+				<amcharts:AmGraph
+					id="g6" 
+					lineColor="#df5093"
+					fillColors="[#ffffff]"
+					lineThickness="1.5"
+					valueField="meanIpd"
+					valueAxis="{delayValue}"
+					bulletSize="3"
+					title="meanIpd(ms)"
+					bulletAlpha="0."
+					bullet="bubble"
+					balloonText="[[meanIpd]]ms"
+					balloonColor="#df5093"
+					type="line"/>
+			</amcharts:graphs>
+			<amcharts:categoryAxis>
+				<amcharts:CategoryAxis
+					axisColor="#5490e1" 
+					gridColor="#FFFFFF"
+					gridAlpha="0.5" 
+					title="Time(GMT+0800  中国标准时间)"				
+					titleAlignment="center"
+					titleTextSize="20"
+					maxLabelLength="5"
+					autoGridCount="true"
+					dashLength="5"
+					minPeriod="ss"/>
+			</amcharts:categoryAxis>
+			<amcharts:valueAxes>
+				<amcharts:ValueAxis 
+					id="delayValue"
+					styleName="TextStyle"
+					title="Ping Latency (ms)"
+					titleAlignment="center"
+					titleTextSize="18"
+					titleTextColor="#5490e1"
+					axisColor="#5490e1" 
+					gridColor="#5490e1" 
+					gridAlpha="0.5"
+					autoGridCount="true"
+					dashLength="5"/>
+			</amcharts:valueAxes>			
+			<amcharts:chartCursor>
+				<amcharts:ChartCursor 
+					id="c1"
+					showValueAxisValue="false"
+					crosshair="false" 
+					categoryBalloonColor="#5490e1"
+					cursorColor="#5490e1"
+					cursorPosition="mouse"/>
+			</amcharts:chartCursor>
+			<amcharts:chartScrollbar>
+				<amcharts:ChartScrollbar 
+					backgroundAlpha="0.1"
+					color="#44e2ec"
+					graphFillColor="#44e2ec"
+					graphLineColor="#44e2ec"
+					backgroundColor="#5490E1" 
+					selectedBackgroundColor="#44e2ec"/>
+			</amcharts:chartScrollbar>
+		</amcharts:AmSerialChart>
+		<amcharts:AmLegend 
+			id="aml"
+			dataProvider="{chart}"  
+			width="20%"
+			switchType="v"
+			align="left"
+			marginTop="50"
+			verticalGap="30"
+			horizontalGap="100"
+			valueWidth="90"
+			valueAlign="left"
+			marginRight="20" 
+			marginLeft="20" 
+			textClickEnabled="false" 
+			marginBottom="15"/>
+		<mx:Spacer height="10"/>
+	</s:HGroup>
+
+</s:Application>

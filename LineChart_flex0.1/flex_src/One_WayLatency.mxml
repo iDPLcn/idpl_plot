@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:amcharts="http://www.amcharts.com/com_internal"
+			   width="100%" height="100%"
+			   initialize="init(event)">
+	<fx:Style> 
+		@font-face 
+		{
+			src: url("com/assets/tahoma.ttf");
+			fontFamily: "Tahoma";
+			embedAsCFF: false;
+			unicode-range:
+				U+0020-U+0040, /* Punctuation, Numbers */
+				U+0041-U+005A, /* Upper-Case A-Z */
+				U+005B-U+0060, /* Punctuation and Symbols */
+				U+0061-U+007A, /* Lower-Case a-z */
+				U+007B-U+007E; /* Punctuation and Symbols */            
+		}  
+		
+		.TextStyle 
+		{ 
+			font-family: Tahoma; 
+		}	
+	</fx:Style>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.amcharts.events.AxisEvent;
+			import com.amcharts.events.GraphEvent;
+			import com.classes.BwctlPoint;
+			import com.classes.OwampPoint;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.Text;
+			import mx.events.FlexEvent;
+			import mx.formatters.DateFormatter;
+			import mx.rpc.events.ResultEvent;
+			
+			public var owampPointList:ArrayCollection;
+			[Bindable]
+			private var chartData:ArrayCollection = new ArrayCollection();
+			private var owampHost:String;
+			private var type:String;
+			private var srcIP:String;
+			private var destIP:String;
+			private var owampTimeStart:Number=0;
+			private var owampTimeEnd:Number=0;
+			
+			private var model:XML = new XML();
+			
+			protected function init(event:FlexEvent):void
+			{
+				owampHost=this.parameters.owampHost.toString();
+				type = this.parameters.type.toString();
+				srcIP=this.parameters.srcIP.toString();
+				destIP=this.parameters.destIP.toString();
+				owampTimeStart=this.parameters.owampTimeStart;
+				owampTimeEnd=this.parameters.owampTimeEnd;
+				var url:URLRequest = new URLRequest("../../config/Node.xml");  					
+				var loader:URLLoader = new URLLoader();
+				loader.addEventListener(Event.COMPLETE,handleCompleted);	
+				loader.load(url);
+			}
+			
+			private function handleCompleted(event:Event):void
+			{
+				
+				var loader:URLLoader = URLLoader(event.target);				
+				model = XML(loader.data);
+//				Alert.show(bwctlHost.toString());
+				var obj:Object = model.hostname.(@name==owampHost); 
+				var srcURL:Object = model.ip.(@name==srcIP); 
+				var destURL:Object = model.ip.(@name==destIP); 				
+				var src:String = srcURL.addr.(@type==type).valueOf();
+				var dest:String = destURL.addr.(@type==type).valueOf();
+//				Alert.show(src);
+				var url:String = "http://" + src + obj.url.valueOf();
+				serv.setOwampPointList(url,src,dest,owampTimeStart,owampTimeEnd);	
+				
+			}
+			
+			protected function setOwampPointList_resultHandler(event:ResultEvent):void
+			{
+				owampPointList = ArrayCollection(event.result);
+				for(var i:int=0; i<owampPointList.length; i++){
+					var owampPoint:OwampPoint=owampPointList.getItemAt(i) as OwampPoint;
+					var date:Date=new Date(owampPoint.unixtime);
+					var df:DateFormatter = new DateFormatter();
+					df.formatString = "HH:NN YYYY/MM/DD";
+
+					var obj:Object = new Object();
+					obj.time = df.format(date);
+					if(owampPoint.minDelay!=0){
+						obj.minDelay = (Number)((Math.round(owampPoint.minDelay*1000000)/1000).toFixed(6));
+					}
+					if(owampPoint.maxDelay!=0){
+						obj.maxDelay = (Number)((Math.round(owampPoint.maxDelay*1000000)/1000).toFixed(6));
+					}
+					obj.maxError = (Number)((Math.round(owampPoint.maxError*100000)/1000).toFixed(6));
+					obj.duplicates = (Number)((Math.round(owampPoint.duplicates*100000)/1000).toFixed(6));
+					obj.loss = (Number)((Math.round(owampPoint.loss*100000)/1000).toFixed(6));
+					chartData.addItem(obj);
+					
+				}
+			}					
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<!-- flex与普通java类的方法通信 -->
+		<s:RemoteObject id="serv" destination="myservice" showBusyCursor="true">
+			<s:method name="setOwampPointList" result="setOwampPointList_resultHandler(event)"/>
+		</s:RemoteObject>
+	</fx:Declarations>
+	
+	<s:HGroup width="100%" height="100%" >
+		<amcharts:AmSerialChart  
+			id="chart" 
+			width="80%" 
+			height="90%"
+			dataProvider="{chartData}" 
+			categoryField="time"
+			plotAreaFillAlphas="[0]">			
+			<amcharts:graphs>
+				<amcharts:AmGraph
+					id="g0" 
+					lineColor="#e97441"
+					fillColors="[#ffffff]"
+					lineThickness="1.5"
+					valueField="minDelay"
+					valueAxis="{delayValue}"
+					bulletSize="3"
+					bullet="bubble"
+					title="minDelay(ms)"
+					balloonText="[[minDelay]]ms"
+					balloonColor="#e97441"
+					type="line"/>
+				<amcharts:AmGraph
+					id="g1" 
+					lineColor="#e5cb52"
+					fillColors="[#ffffff]" 
+					lineThickness="1.5"
+					valueField="maxDelay"
+					valueAxis="{delayValue}"
+					bulletSize="3"
+					title="maxDelay(ms)"
+					bullet="bubble"
+					balloonText="[[maxDelay]]ms"
+					balloonColor="#e5cb52"
+					type="line"/>
+				<amcharts:AmGraph
+					id="g2" 
+					lineColor="#53e0db"
+					fillColors="[#ffffff]"
+					lineThickness="1.5"
+					valueField="maxError"
+					valueAxis="{lossValue}"
+					bulletSize="3"
+					title="maxError(%)"
+					bullet="bubble"
+					balloonText="[[maxError]]%"
+					balloonColor="#53e0db"
+					type="line"/>
+				<amcharts:AmGraph
+					id="g3" 
+					lineColor="#3ae198"
+					fillColors="[#ffffff]" 
+					lineThickness="1.5"
+					valueField="duplicates"
+					valueAxis="{lossValue}"
+					bulletSize="3"
+					title="duplicates(%)"
+					bullet="bubble"
+					balloonText="[[duplicates]]%"
+					balloonColor="#3ae198"
+					type="line"/>
+				<amcharts:AmGraph
+					id="g4" 
+					lineColor="#4872d2"
+					fillColors="[#ffffff]" 
+					lineThickness="1.5"
+					valueField="loss"
+					valueAxis="{lossValue}"
+					bulletSize="3"
+					title="loss(%)"
+					bullet="bubble"
+					balloonText="[[loss]]%"
+					balloonColor="#4872d2"
+					type="line"/>
+			</amcharts:graphs>
+			<amcharts:categoryAxis>
+				<amcharts:CategoryAxis
+					id="axis"
+					axisColor="#5490e1"
+					labelBackgroundAlpha="0"
+					gridColor="#FFFFFF"
+					gridAlpha="0.5" 
+					title="Time(GMT+0800  中国标准时间)"				
+					titleAlignment="center"
+					titleTextSize="20"
+					maxLabelLength="5"
+					autoGridCount="true"
+					textAlign="left"						
+					dashLength="5"
+					minPeriod="ss"/>
+			</amcharts:categoryAxis>
+			<amcharts:valueAxes>
+				<amcharts:ValueAxis 
+					id="delayValue"
+					styleName="TextStyle"
+					title="One Way Latency (ms)"
+					titleAlignment="center"
+					titleTextSize="18"
+					titleTextColor="#deb441"
+					axisColor="#deb441" 
+					gridColor="#deb441"
+					gridAlpha="0.3"		
+					autoGridCount="true"
+					dashLength="5"/>
+				<amcharts:ValueAxis
+					id="lossValue"		
+					styleName="TextStyle"
+					title="Loss(%)"
+					titleAlignment="center"
+					titleTextSize="18"
+					titleTextColor="#15bc77"
+					axisColor="#15bc77" 
+					gridColor="#15bc77"
+					position="right"
+					gridAlpha="0.3"
+					showLastLabel="false"
+					autoGridCount="true"
+					dashLength="5"/>
+			</amcharts:valueAxes>			
+			<amcharts:chartCursor>
+				<amcharts:ChartCursor 
+					id="c1"
+					showValueAxisValue="false"
+					crosshair="false" 
+					categoryBalloonColor="#5490e1"
+					cursorColor="#5490e1"
+					cursorPosition="mouse"/>
+			</amcharts:chartCursor>
+			<amcharts:chartScrollbar>
+				<amcharts:ChartScrollbar
+					backgroundAlpha="0.1"
+					color="#44e2ec"
+					graphFillColor="#44e2ec"
+					graphLineColor="#44e2ec"
+					backgroundColor="#5490E1" 
+					selectedBackgroundColor="#44e2ec"/>
+			</amcharts:chartScrollbar>
+		</amcharts:AmSerialChart>						
+		<amcharts:AmLegend
+			id="amlegend"
+			dataProvider="{chart}"  
+			width="20%"
+			switchType="v"
+			align="left"
+			marginTop="50"
+			verticalGap="30"
+			horizontalGap="100"
+			valueWidth="90"
+			valueAlign="left"
+			marginRight="20" 
+			marginLeft="20" 
+			textClickEnabled="false" 
+			marginBottom="15"/>
+		<mx:Spacer height="10"/>
+	</s:HGroup>			
+	
+</s:Application>
