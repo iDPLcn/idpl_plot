@@ -1,0 +1,32 @@
+HTML{
+	width: 95%;
+    height:95%;
+    margin:0 auto;
+    text-align:center;
+}
+
+BODY {
+	top:10px;
+	margin:0 auto;
+	text-align:left;
+    FONT-SIZE: 20px; 
+    FONT-FAMILY: Tahoma; 
+    width: 100%;
+    height:100%;
+    border: thin;
+}
+
+.container{
+	width: 98%;
+    height:98%;
+    margin:10 auto;
+    text-align:left;
+}
+.container h3{
+    margin:10 auto;
+    text-align:center;
+}
+.container h4{
+    margin:10 auto;
+    text-align:center;
+}
