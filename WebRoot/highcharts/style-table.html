@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>A Beautiful Table</title>
+<link rel="stylesheet" type="text/css" media="screen" href="css/css-table.css" />
+<script type="text/javascript" src="js/jquery-1.2.6.min.js"></script>
+<script type="text/javascript" src="js/style-table.js"></script>
+</head>
+
+<body>
+
+<table id="travel" summary="Travel times to work by main mode (Autumn 2006) - Source: London Travel Report 2007 http://www.tfl.gov.uk/assets/downloads/corporate/London-Travel-Report-2007-final.pdf">
+
+	<caption>Click a hostname to see a graph of the results
+
+Grey text indicates inactive test (tests that have not run in the last 7 days)</caption>
+    
+    <thead>    
+    	<tr>
+            <th scope="col" rowspan="2">Source</th>
+            <th scope="col" rowspan="2">Destination</th>
+            <th scope="col" colspan="2">Latency (ms)</th>
+        </tr>
+        
+        <tr>
+            <th scope="col">src-dst</th>
+            <th scope="col">dst-src</th>     
+        </tr>        
+    </thead>
+    
+    <tbody>
+    	<tr>
+    		<th scope="row">dell01.jsi.buaa.edu.cn (115.25.138.245)</th>
+    		<th scope="row">idplcnic2 (159.226.224.180)</th>
+            <td>48</td>
+            <td>32</td>
+        </tr>
+        
+        <tr>
+        	<th scope="row">dell01.jsi.buaa.edu.cn (115.25.138.245)</th>
+    		<th scope="row">komatsu.chtc.wisc.edu (128.104.153.60)</th>
+            <td>17</td>
+            <td>42</td>
+        </tr>
+        
+        <tr>
+        	<th scope="row">dell01.jsi.buaa.edu.cn (115.25.138.245)</th>
+    		<th scope="row">calit2-119-113.ucsd.edu (137.110.119.113)</th>
+            <td>32</td>
+            <td>25</td>
+        </tr>           
+    </tbody>
+
+</table>
+
+</body>
+</html>

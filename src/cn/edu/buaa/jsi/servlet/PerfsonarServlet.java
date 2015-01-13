@@ -1,4 +1,4 @@
-package cn.edu.buaa.jsi.servlet;
+ï»¿package cn.edu.buaa.jsi.servlet;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -51,11 +51,11 @@ public class PerfsonarServlet extends HttpServlet {
 		String url = null;
 		JSONObject json = new JSONObject();
 		try {
-			SAXReader sr = new SAXReader(); // »ñÈ¡¶ÁÈ¡xmlµÄ¶ÔÏó¡£
-			org.dom4j.Document doc = sr.read("../webapps/config/Node.xml");// windowsÏÂ
+			SAXReader sr = new SAXReader(); // è·å–è¯»å–xmlçš„å¯¹è±¡ã€‚
+			org.dom4j.Document doc = sr.read("../webapps/config/Node.xml");// windowsä¸‹
 			// org.dom4j.Document doc =
-			// sr.read("/home/kwang/apache-tomcat-7.0.56/webapps/config/Node.xml");//linuxÏÂ
-			Element el_root = doc.getRootElement();// ÏòÍâÈ¡Êı¾İ£¬»ñÈ¡xmlµÄ¸ù½Úµã¡£
+			// sr.read("/home/kwang/apache-tomcat-7.0.56/webapps/config/Node.xml");//linuxä¸‹
+			Element el_root = doc.getRootElement();// å‘å¤–å–æ•°æ®ï¼Œè·å–xmlçš„æ ¹èŠ‚ç‚¹ã€‚
 			url = el_root.elementText("jsonService");
 			src = el_root.element(src).elementText(type);
 			dst = el_root.element(dst).elementText(type);
@@ -78,11 +78,11 @@ public class PerfsonarServlet extends HttpServlet {
 		String lossmessage = null, owdelaymessage = null, pingmessage = null, throughputmessage = null;
 		JSONArray lossjsonarray = null, owdelayjsonarray = null, pingjsonarray = null, throughputjsonarray = null;
 		try {
-			lossmessage = loadJSON(lossURL); // jsonmessage½Ó¿Ú»ñÈ¡µÄ×Ö·û´®
+			lossmessage = loadJSON(lossURL); // jsonmessageæ¥å£è·å–çš„å­—ç¬¦ä¸²
 			owdelaymessage = loadJSON(owdelayURL);
 			pingmessage = loadJSON(pingURL);
 			throughputmessage = loadJSON(throughputURL);
-			lossjsonarray = new JSONArray(lossmessage); // ×Ö·û´®×ª³Éjsonarray
+			lossjsonarray = new JSONArray(lossmessage); // å­—ç¬¦ä¸²è½¬æˆjsonarray
 			owdelayjsonarray = new JSONArray(owdelaymessage);
 			pingjsonarray = new JSONArray(pingmessage);
 			throughputjsonarray = new JSONArray(throughputmessage);
@@ -99,7 +99,7 @@ public class PerfsonarServlet extends HttpServlet {
 					+ "\nowdelaymessage:" + owdelaymessage + "\npingmessage:"
 					+ pingmessage + "\nthroughputmessage:" + throughputmessage);
 			try {
-				lossjsonarray = new JSONArray("[]"); // »ñÈ¡Êı¾İÊ§°ÜÊ±ËÄ×éÊı¾İ¾ù·µ»Ø¿ÕÊı×éµ½Ç°Ì¨
+				lossjsonarray = new JSONArray("[]"); // è·å–æ•°æ®å¤±è´¥æ—¶å››ç»„æ•°æ®å‡è¿”å›ç©ºæ•°ç»„åˆ°å‰å°
 				owdelayjsonarray = new JSONArray("[]");
 				pingjsonarray = new JSONArray("[]");
 				throughputjsonarray = new JSONArray("[]");
@@ -116,11 +116,11 @@ public class PerfsonarServlet extends HttpServlet {
 	}
 
 	/**
-	 * ·ÃÎÊurl»ñÈ¡jsonÊı¾İ
+	 * è®¿é—®urlè·å–jsonæ•°æ®
 	 * 
 	 * @param url
-	 *            µØÖ·
-	 * @return json×Ö·û´®
+	 *            åœ°å€
+	 * @return jsonå­—ç¬¦ä¸²
 	 */
 	private String loadJSON(String url) {
 		StringBuilder json = new StringBuilder();

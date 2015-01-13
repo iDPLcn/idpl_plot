@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <title>如何为div加样式"add"或者".css"都可以为每个div背景加色</title>
+<head>
+  <style>
+ div { width:60px; height:60px; margin:10px; float:left; }
+ p { clear:left; font-weight:bold; font-size:16px; 
+     color:blue; margin:0 10px; padding:2px; }
+ </style>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+</head>
+<body>
+  <div></div>
+
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+
+  Added this... (notice no border)
+  <table>
+    <tbody id="kk1">
+    <tr><td>fewfew</td></tr>
+    <tbody>
+</table>
+<input type="button" value="点击" onclick="appd();"/>
+
+<script>
+<!--.add为为字体加框，.css为为每个div背景加色-->
+$("div").css("border", "2px solid red") .add("p").css("background", "yellow");
+function appd(){
+  alert("kk");
+  $("#kk1").append("<tr id='kkk'><td>123</td></tr>").on('mouseenter',function(){	alert("haha")}).on('mouseleave',function(){	alert("hehe")});
+
+}
+</script>
+
+</body>
+</html>

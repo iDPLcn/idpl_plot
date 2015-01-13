@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>graph.html</title>
+	
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    
+    <link rel="stylesheet" type="text/css" href="css/graph.css">
+    <script type="text/javascript" src="js/jquery.1.9.1.min.js"></script>
+    <script type="text/javascript" src="js/highcharts.js"></script>
+    <script type="text/javascript" src="js/drawgraph.js"></script>
+
+  </head>
+  
+  <body>
+	<table class="hosts">
+		<tbody>
+			<tr>
+				<th>Source</th>
+				<th></th>
+				<th>Destination</th>
+			</tr>
+			<tr class="host_table_0">
+				<td><span id="source_host_0" class="host_table_host"></span></td>
+				<td>--</td>
+				<td><span id="dest_host_0" class="host_table_host"></span></td>
+			</tr>
+			<tr>
+				<td><span id="source_ip_0"></span></td>
+				<td>--</td>
+				<td><span id="dest_ip_0"></span></td>
+			</tr>
+<!-- 			<tr class="host_table_0"> -->
+<!-- 				<td>Capacity: <span id="source_capacity_0" -->
+<!-- 					style="margin-right: 10px;">1.0G</span> MTU: <span -->
+<!-- 					id="source_mtu_0">1500</span></td> -->
+<!-- 				<td></td> -->
+<!-- 				<td>Capacity: <span id="dest_capacity_0" -->
+<!-- 					style="margin-right: 10px;">1.0G</span> MTU: <span id="dest_mtu_0">1500</span> -->
+<!-- 				</td> -->
+<!-- 			</tr> -->
+		</tbody>
+	</table>
+	<div id="nav"  class="nav">
+		<div id="time-selector" class="time-selector">
+			<div>
+				<b>Zoom: </b> 
+				<a id="1dLink" href="#" onclick="get1dLink()">1d</a>
+				<a id="3dLink" href="#" onclick="get3dLink()">3d</a> 
+				<a id="1wLink" href="#" onclick="get1wLink()">1w</a> 
+				<a id="1mLink" href="#" onclick="get1mLink()">1m</a> 
+				<a id="1yLink" href="#" onclick="get1yLink()">1y</a>
+			</div>
+		</div>
+		<div>
+			<a id="previous" href="#" class="previous" onclick="previous()">Previous 1w</a>
+			<a id="graphTimeRange" ></a>		
+		</div>
+	</div>
+	<div id="container" class="container">
+	</div>
+</body>
+</html>
