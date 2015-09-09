@@ -49,6 +49,10 @@ span.psgraph-val { font-family: "Lucida Console", Monaco, monospace; }
 	margin-right: 3em;	
 	color: blue;
 }
+.next{
+	margin-left: 3em;	
+	color: blue;
+}
 
 .container{
 	width: 90%;

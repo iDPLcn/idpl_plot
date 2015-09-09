@@ -1,38 +1,79 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Data Placement Tests</title>
-<link rel="stylesheet" type="text/css" media="screen" href="css/css-table.css" />
-<script type="text/javascript" src="js/jquery-1.2.6.min.js"></script>
-<script type="text/javascript" src="js/set_table.js"></script>
+<!DOCTYPE html>
+<html>
+<head>	
+	<title>Data Placement Tests</title>
+	<meta http-equiv="progma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache,must-revalidate">
+	<meta http-equiv="expires" content="0">
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="css/css-table.css" />
+	<script type="text/javascript" src="js/jquery-1.2.6.min.js"></script>
+	<script type="text/javascript" src="js/set_table.js"></script>
 </head>
 
 <body>
 
-<table id="travel" summary="Travel times to work by main mode (Autumn 2006) - Source: London Travel Report 2007 http://www.tfl.gov.uk/assets/downloads/corporate/London-Travel-Report-2007-final.pdf">
+<table id="International">
 
-	<caption>Click a hostname to see a graph of the results
+	<caption>International</caption>   
+    <thead>    
+    	<tr>
+            <th scope="col" rowspan=3">Source</th>
+            <th scope="col" rowspan="3">Destination</th>
+            <th scope="col" colspan="5">average throughput(bps)</th>
+        </tr>
+        <tr>
+            <th scope="col">perfaonar</th>
+            <th scope="col">IPERF</th>
+            <th scope="col">SCP</th>
+            <th scope="col">NETCAT</th>
+            <th scope="col">FDT</th>
+        </tr>       
+    </thead>
+    
+    <tbody id="tableTBody_International">
+    	<tr>
+    		<th scope="row"></th>
+    		<th scope="row"></th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>     
+    </tbody>
+</table>
 
-Grey text indicates inactive test (tests that have not run in the last 7 days)</caption>
+<table id="Domestic">
+
+	<caption>Domestic</caption>
     
     <thead>    
     	<tr>
-            <th scope="col" rowspan="2">Source</th>
-            <th scope="col" rowspan="2">Destination</th>
-            <th scope="col" colspan="2">Latency (ms)</th>
+            <th scope="col" rowspan="3">Source</th>
+            <th scope="col" rowspan="3">Destination</th>
+            <th scope="col" colspan="5">average throughput(bps)</th>
         </tr>
         
         <tr>
-            <th scope="col">src-dst</th>
-            <th scope="col">dst-src</th>     
-        </tr>        
+            <th scope="col">perfaonar</th>
+            <th scope="col">IPERF</th>
+            <th scope="col">SCP</th>
+            <th scope="col">NETCAT</th>
+            <th scope="col">FDT</th>
+        </tr>       
     </thead>
     
-    <tbody id="tableTBody">
+    <tbody id="tableTBody_Domestic">
     	<tr>
     		<th scope="row"></th>
     		<th scope="row"></th>
+            <td></td>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
         </tr>     

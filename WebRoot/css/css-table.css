@@ -1,5 +1,5 @@
 body { 
-	width:900px;
+	width:1200px;
 	margin:10px auto; 
 	text-align:center;
 	padding:20px; 
@@ -12,6 +12,7 @@ p,
 table, caption, td, tr, th {
 	margin:0 auto;
 	padding:0;
+	text-align:center;
 	font-weight:normal;
 	}
 
@@ -30,8 +31,7 @@ table {
 	}
 	
 	caption {
-		text-align:left;
-		font-size:15px;
+		font-size:18px;
 		padding-bottom:10px;
 		}
 	
